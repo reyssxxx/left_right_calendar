@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eceff3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161c" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Записи</title>
+<style>
+:root{--bg:#eceff3;--card:#fff;--ink:#14213d;--mute:#66707f;--line:#d9dee6;--L:#1d4ed8;--R:#0f766e;--bad:#b42318;--warn:#fff1c2;--warnink:#5c4300}
+@media(prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b2129;--ink:#e8ecf2;--mute:#97a1b0;--line:#2b3340;--L:#7aa2ff;--R:#4fd1c0;--bad:#ff8a80;--warn:#3a3012;--warnink:#f3dc99}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:16px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;padding-top:env(safe-area-inset-top)}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:44px;padding:0 14px}
+button:active{background:var(--line)}
+:focus-visible{outline:2px solid var(--L);outline-offset:1px}
+header{display:flex;align-items:center;gap:6px;padding:8px 8px 4px}
+.nav{width:44px;padding:0;font-size:24px}
+.ttl{flex:1;border:0;background:none;text-align:center;line-height:1.15}
+#dow{display:block;font-size:13px;color:var(--mute)}
+#dt{font:600 21px Georgia,"Times New Roman",serif}
+.ttl.off #dt,.ttl.off #dow{color:var(--bad)}
+.tools{display:flex;gap:8px;padding:4px 8px 8px}
+.tools input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 10px;min-height:44px}
+#banner{display:block;width:calc(100% - 16px);margin:0 8px 8px;text-align:left;background:var(--warn);color:var(--warnink);border-color:transparent;font-size:14px;padding:8px 12px}
+main{flex:1;overflow:auto;padding:0 8px 12px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:0}
+h2{margin:0 0 8px;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+h2 .sum{font-size:18px}
+[data-c=L] h2{color:var(--L)}[data-c=R] h2{color:var(--R)}
+.add input{display:block;width:100%;font-size:19px;border:1px solid var(--line);border-radius:10px;padding:0 10px;min-height:46px;background:var(--bg)}
+.add input.bad{border-color:var(--bad)}
+.add div{display:flex;gap:6px;margin:6px 0 4px}
+.add .sg{flex:1;padding:0}.add .go{flex:2;padding:0;background:var(--ink);color:var(--card);border-color:var(--ink)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:11px 2px;border-top:1px solid var(--line);min-height:44px}
+li .v{font-weight:600;font-size:17px;overflow-wrap:anywhere}
+li .t{font-size:12px;color:var(--mute);white-space:nowrap}
+li.empty{color:var(--mute);justify-content:center;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wd{font-size:12px;color:var(--mute);text-align:center;padding:4px 0}
+.day{min-height:58px;padding:4px 1px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:10px}
+.day i{font-style:normal;font-weight:600}
+.day b{font-size:10px;font-weight:500;color:var(--mute);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day.today{border-color:var(--ink)}
+.day.sel{background:var(--ink);color:var(--card)}.day.sel b{color:inherit}
+.day.void{visibility:hidden}
+footer{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
+footer div{text-align:center;min-width:0}
+footer small{display:block;font-size:12px;color:var(--mute)}
+footer b{font-size:18px;overflow-wrap:anywhere}
+footer .tot b{font-size:21px}
+#fl{color:var(--L)}#fr{color:var(--R)}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);width:min(92vw,420px);padding:16px}
+dialog::backdrop{background:#0008}
+dialog h3{margin:0 0 10px;font:600 19px Georgia,serif}
+dialog label{display:block;font-size:14px;color:var(--mute);margin:8px 0}
+dialog input,dialog select{display:block;width:100%;margin-top:4px;font-size:19px;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:0 10px;background:var(--bg)}
+dialog input.bad{border-color:var(--bad)}
+.row{display:flex;gap:8px;margin-top:12px}.row button{flex:1;padding:0 6px}
+.stack button{display:block;width:100%;margin-top:8px}
+.primary{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.danger{color:var(--bad);border-color:var(--bad)}
+.note{font-size:14px;color:var(--mute);margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+  <button class="nav" id="prev" aria-label="Назад">‹</button>
+  <button class="ttl" id="ttl"><span id="dow"></span><span id="dt"></span></button>
+  <button class="nav" id="next" aria-label="Вперёд">›</button>
+  <button class="nav" id="menu" aria-label="Меню и копии">⋯</button>
+</header>
+<div class="tools">
+  <button id="today">Сегодня</button>
+  <button id="mode">Месяц</button>
+  <input type="date" id="jump" aria-label="Перейти к дате">
+</div>
+<button id="banner" hidden></button>
+
+<main id="dayView">
+  <div class="cols">
+    <section data-c="L"><h2>Левые <span class="sum">0</span></h2>
+      <div class="add"><input inputmode="decimal" placeholder="Число" enterkeyhint="done" autocomplete="off"><div><button class="sg" aria-label="Сменить знак">±</button><button class="go">Добавить</button></div></div>
+      <ul></ul></section>
+    <section data-c="R"><h2>Правые <span class="sum">0</span></h2>
+      <div class="add"><input inputmode="decimal" placeholder="Число" enterkeyhint="done" autocomplete="off"><div><button class="sg" aria-label="Сменить знак">±</button><button class="go">Добавить</button></div></div>
+      <ul></ul></section>
+  </div>
+</main>
+<main id="monthView" hidden><div class="grid" id="grid"></div></main>
+
+<footer>
+  <div><small>Левые</small><b id="fl">0</b></div>
+  <div><small>Правые</small><b id="fr">0</b></div>
+  <div class="tot"><small id="fs">Всего</small><b id="ft">0</b></div>
+</footer>
+
+<dialog id="ed">
+  <h3>Запись</h3>
+  <label>Число<input id="edv" inputmode="decimal" autocomplete="off"></label>
+  <label>Столбец<select id="edc"><option value="L">Левые</option><option value="R">Правые</option></select></label>
+  <p class="note" id="edinfo"></p>
+  <div class="row"><button class="danger" id="edDel">Удалить</button><button id="edX">Отмена</button><button class="primary" id="edSave">Сохранить</button></div>
+</dialog>
+
+<dialog id="set">
+  <h3>Копии и перенос</h3>
+  <p class="note" id="stat"></p>
+  <p class="note">Записи хранятся только на этом телефоне. Если очистить данные браузера или удалить приложение, они пропадут. Сохраняйте копию раз в неделю и отправляйте себе в Telegram или на почту.</p>
+  <div class="stack">
+    <button id="inst" class="primary" hidden>Установить приложение</button>
+    <button id="exShare" class="primary" hidden>Отправить копию</button>
+    <button id="exJson">Скачать копию (файл)</button>
+    <button id="imp">Загрузить копию из файла</button>
+    <button id="exCsv">Таблица для Excel (.csv)</button>
+    <button id="undo" class="danger" hidden>Отменить последний импорт</button>
+  </div>
+  <p class="note">Импорт только добавляет недостающие записи: ничего не удаляется и не заменяется. Файл копии может называться .json или .txt, подойдёт любой.</p>
+  <p class="note" id="pers"></p>
+  <div class="row"><button id="setX">Закрыть</button></div>
+  <input type="file" id="file" hidden>
+</dialog>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const pad=n=>String(n).padStart(2,'0');
+const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromKey=k=>{const[a,b,c]=k.split('-').map(Number);return new Date(a,b-1,c)};
+const NF=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:6});
+const fmt=n=>NF.format(Object.is(n,-0)?0:n);
+const F=o=>new Intl.DateTimeFormat('ru-RU',o);
+const fWD=F({weekday:'long'}),fDM=F({day:'numeric',month:'long'}),fMo=F({month:'long'}),fSh=F({day:'numeric',month:'short'}),fFull=F({weekday:'short',day:'numeric',month:'long',year:'numeric'});
+const hm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const hms=t=>hm(t)+':'+pad(new Date(t).getSeconds());
+const sum=a=>a.reduce((s,e)=>s+Math.round(e.v*1e6),0)/1e6;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const ago=t=>{const d=Math.floor((Date.now()-t)/864e5);return d<1?'сегодня':d===1?'вчера':d+' дн. назад'};
+const NAME={L:'Левые',R:'Правые'};
+function parse(s){s=s.replace(/[\s\u00a0]/g,'').replace(',','.').replace('−','-');if(!/^-?(\d+\.?\d*|\.\d+)$/.test(s))return null;const n=parseFloat(s);return isFinite(n)&&Math.abs(n)<1e9?n:null}
+
+const KEY='dl1';
+function load(){let raw=null;try{raw=localStorage.getItem(KEY);if(raw){const j=JSON.parse(raw);if(j&&Array.isArray(j.entries))return j}}catch(e){if(raw)try{localStorage.setItem(KEY+'_broken',raw)}catch(_){}}return{entries:[],lastExport:0,mod:0,lastImport:[]}}
+let S=load();
+function save(touch=true){if(touch)S.mod=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){alert('Не удалось сохранить! Сделайте копию (кнопка ⋯) и освободите место на телефоне.');return false}}
+let persistAsked=false;
+function askPersist(){if(!persistAsked&&navigator.storage&&navigator.storage.persist){persistAsked=true;navigator.storage.persist()}}
+
+let cur=new Date();cur.setHours(0,0,0,0);
+let mode='day',tk=key(new Date());
+
+function foot(es,scope){$('#fl').textContent=fmt(sum(es.filter(e=>e.c==='L')));$('#fr').textContent=fmt(sum(es.filter(e=>e.c==='R')));$('#ft').textContent=fmt(sum(es));$('#fs').textContent='Всего за '+scope}
+function render(){
+  const today=key(new Date()),k=key(cur);
+  $('#dayView').hidden=mode!=='day';$('#monthView').hidden=mode!=='month';
+  $('#mode').textContent=mode==='day'?'Месяц':'День';
+  $('#jump').value=k;
+  banner();
+  if(mode==='day'){
+    const es=S.entries.filter(e=>e.d===k).sort((a,b)=>b.t-a.t);
+    $('#dow').textContent=fWD.format(cur)+(k===today?', сегодня':'');
+    $('#dt').textContent=fDM.format(cur)+' '+cur.getFullYear();
+    $('#ttl').classList.toggle('off',k!==today);
+    for(const c of['L','R']){
+      const l=es.filter(e=>e.c===c),sec=$(`section[data-c=${c}]`);
+      sec.querySelector('.sum').textContent=fmt(sum(l));
+      sec.querySelector('ul').innerHTML=l.map(e=>`<li data-id="${e.id}"><span class="v">${fmt(e.v)}</span><span class="t">${key(new Date(e.t))===e.d?'':fSh.format(e.t)+' '}${hm(e.t)}${e.e?' ✎':''}</span></li>`).join('')||'<li class="empty">Пока пусто</li>';
+    }
+    foot(es,'день');
+  }else{
+    const y=cur.getFullYear(),m=cur.getMonth(),pre=`${y}-${pad(m+1)}-`;
+    $('#dow').textContent='Календарь';$('#dt').textContent=fMo.format(cur)+' '+y;$('#ttl').classList.remove('off');
+    const by={};S.entries.forEach(e=>{if(e.d.startsWith(pre))(by[e.d]=by[e.d]||[]).push(e)});
+    let h=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="wd">${x}</div>`).join('');
+    const off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate();
+    h+='<div class="day void"></div>'.repeat(off);
+    for(let d=1;d<=n;d++){const dk=pre+pad(d),a=by[dk];h+=`<button class="day${dk===today?' today':''}${dk===k?' sel':''}" data-k="${dk}"><i>${d}</i><b>${a?fmt(sum(a)):''}</b></button>`}
+    $('#grid').innerHTML=h;
+    foot(Object.values(by).flat(),'месяц');
+  }
+}
+function banner(){
+  const b=$('#banner'),n=S.entries.length,base=S.lastExport||Math.min(...S.entries.map(e=>e.t));
+  const need=n&&S.mod>S.lastExport&&Date.now()-base>7*864e5;
+  b.hidden=!need;
+  if(need)b.textContent=S.lastExport?`Копия сохранена ${ago(S.lastExport)}. Нажмите, чтобы сохранить свежую.`:'Копия записей ещё не сохранялась. Нажмите, чтобы сохранить.';
+}
+function step(n){cur=mode==='day'?new Date(cur.getFullYear(),cur.getMonth(),cur.getDate()+n):new Date(cur.getFullYear(),cur.getMonth()+n,1);render()}
+$('#prev').onclick=()=>step(-1);$('#next').onclick=()=>step(1);
+$('#today').onclick=()=>{cur=new Date();cur.setHours(0,0,0,0);mode='day';render()};
+$('#mode').onclick=$('#ttl').onclick=()=>{mode=mode==='day'?'month':'day';render()};
+$('#jump').onchange=e=>{if(e.target.value){cur=fromKey(e.target.value);mode='day';render()}};
+$('#grid').onclick=e=>{const b=e.target.closest('[data-k]');if(b){cur=fromKey(b.dataset.k);mode='day';render()}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)return;const n=key(new Date());if(n!==tk){if(key(cur)===tk){cur=new Date();cur.setHours(0,0,0,0)}tk=n;render()}});
+
+$$('section[data-c]').forEach(sec=>{
+  const c=sec.dataset.c,inp=sec.querySelector('input');
+  const go=()=>{
+    const v=parse(inp.value);
+    if(v===null){inp.classList.add('bad');inp.focus();return}
+    S.entries.push({id:uid(),d:key(cur),c,v,t:Date.now()});
+    if(!save()){S.entries.pop();return}
+    inp.value='';inp.focus();askPersist();render();
+  };
+  sec.querySelector('.go').onclick=go;
+  sec.querySelector('.sg').onclick=()=>{inp.value=inp.value.startsWith('-')?inp.value.slice(1):'-'+inp.value;inp.focus()};
+  sec.querySelectorAll('.add button').forEach(b=>b.onmousedown=e=>e.preventDefault());
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+  inp.oninput=()=>inp.classList.remove('bad');
+  sec.querySelector('ul').onclick=e=>{const li=e.target.closest('li[data-id]');if(li)openEd(li.dataset.id)};
+});
+
+let editing=null;
+function openEd(id){
+  const e=S.entries.find(x=>x.id===id);if(!e)return;editing=e;
+  $('#edv').value=String(e.v).replace('.',',');$('#edv').classList.remove('bad');$('#edc').value=e.c;
+  $('#edinfo').innerHTML='Записано: '+fFull.format(e.t)+', '+hms(e.t)+(e.e?'<br>Изменено: '+fFull.format(e.e)+', '+hms(e.e):'');
+  $('#ed').showModal();
+}
+$('#edX').onclick=()=>$('#ed').close();
+$('#edSave').onclick=()=>{
+  const v=parse($('#edv').value),c=$('#edc').value;
+  if(v===null){$('#edv').classList.add('bad');return}
+  if(v===editing.v&&c===editing.c){$('#ed').close();return}
+  const o={v:editing.v,c:editing.c,e:editing.e};
+  Object.assign(editing,{v,c,e:Date.now()});
+  if(save()){$('#ed').close();render()}else Object.assign(editing,o);
+};
+$('#edDel').onclick=()=>{
+  if(!confirm('Удалить запись '+fmt(editing.v)+' ('+NAME[editing.c].toLowerCase()+')?'))return;
+  const i=S.entries.indexOf(editing);S.entries.splice(i,1);
+  if(save()){$('#ed').close();render()}else S.entries.splice(i,0,editing);
+};
+
+const stamp=()=>key(new Date());
+const payload=()=>JSON.stringify({app:'dayledger',version:1,exported:new Date().toISOString(),entries:S.entries});
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+function mark(){S.lastExport=Date.now();save(false);render();info()}
+function info(){
+  $('#stat').textContent=`Записей: ${S.entries.length}. `+(S.lastExport?`Последняя копия: ${ago(S.lastExport)}.`:'Копия ещё не сохранялась.');
+  $('#undo').hidden=!(S.lastImport&&S.lastImport.length);
+  if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(p=>$('#pers').textContent=p?'Защита от автоочистки браузером: включена.':'Защита от автоочистки пока не включена. Пользуйтесь приложением с иконки на главном экране.');
+}
+$('#menu').onclick=$('#banner').onclick=()=>{info();$('#set').showModal()};
+$('#setX').onclick=()=>$('#set').close();
+$('#exJson').onclick=()=>{dl(`zapisi-${stamp()}.json`,payload(),'application/json');mark()};
+$('#exCsv').onclick=()=>{
+  const r=[...S.entries].sort((a,b)=>a.d.localeCompare(b.d)||a.t-b.t).map(e=>[e.d,hms(e.t),NAME[e.c],String(e.v).replace('.',',')].join(';'));
+  dl(`zapisi-${stamp()}.csv`,'\ufeffДата;Время записи;Столбец;Число\r\n'+r.join('\r\n'),'text/csv');
+};
+const probe=()=>{try{return navigator.canShare&&navigator.canShare({files:[new File(['x'],'a.txt',{type:'text/plain'})]})}catch(e){return false}};
+if(probe())$('#exShare').hidden=false;
+$('#exShare').onclick=async()=>{
+  try{await navigator.share({files:[new File([payload()],`zapisi-${stamp()}.txt`,{type:'text/plain'})],title:'Копия записей'});mark()}
+  catch(e){if(e.name!=='AbortError'){dl(`zapisi-${stamp()}.json`,payload(),'application/json');mark()}}
+};
+$('#imp').onclick=()=>$('#file').click();
+const okEntry=x=>x&&typeof x.id==='string'&&/^[\w-]{1,40}$/.test(x.id)&&/^\d{4}-\d\d-\d\d$/.test(x.d)&&(x.c==='L'||x.c==='R')&&Number.isFinite(x.v)&&Number.isFinite(x.t);
+$('#file').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  let arr;try{const j=JSON.parse(await f.text());arr=Array.isArray(j)?j:j.entries}catch(_){}
+  if(!Array.isArray(arr)){alert('Это не похоже на файл копии. Ничего не изменено.');return}
+  const good=arr.filter(okEntry),have=new Set(S.entries.map(x=>x.id)),fresh=good.filter(x=>!have.has(x.id));
+  if(!good.length){alert('В файле нет подходящих записей. Ничего не изменено.');return}
+  if(!confirm(`В файле записей: ${good.length}${good.length<arr.length?` (ещё ${arr.length-good.length} повреждены и пропущены)`:''}.\nНовых: ${fresh.length}, уже есть: ${good.length-fresh.length}.\n\nДобавить новые к текущим? Ничего не удаляется и не заменяется.`))return;
+  const add=fresh.map(x=>({id:x.id,d:x.d,c:x.c,v:x.v,t:x.t,...(Number.isFinite(x.e)?{e:x.e}:{})}));
+  const prevE=S.entries,prevI=S.lastImport;
+  S.entries=prevE.concat(add);S.lastImport=add.map(x=>x.id);
+  if(!save()){S.entries=prevE;S.lastImport=prevI;return}
+  render();info();alert(`Добавлено записей: ${add.length}.`);
+};
+$('#undo').onclick=()=>{
+  const ids=new Set(S.lastImport),n=S.entries.filter(e=>ids.has(e.id)).length;
+  if(!confirm(`Убрать ${n} записей, добавленных последним импортом? Остальные записи не затрагиваются.`))return;
+  S.entries=S.entries.filter(e=>!ids.has(e.id));S.lastImport=[];save();render();info();
+};
+let ip=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();ip=e;$('#inst').hidden=false});
+$('#inst').onclick=async()=>{ip.prompt();await ip.userChoice;ip=null;$('#inst').hidden=true};
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+render();
+</script>
+</body>
+</html>
